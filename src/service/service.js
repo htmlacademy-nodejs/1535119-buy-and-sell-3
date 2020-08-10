@@ -1,67 +1,18 @@
 'use strict';
 
-const fs = require(`fs`);
+const {Cli} = require(`./cli`);
+const {
+  DEFAULT_COMMAND,
+  USER_ARGV_INDEX,
+  ExitCode
+} = require(`./constants`);
 
-const myModule = require(`./ad_data`);
+const userArguments = process.argv.slice(USER_ARGV_INDEX);
+const [userCommand] = userArguments;
 
-const helpText = `Программа запускает http-сервер и формирует файл с данными для API.
+if (userArguments.length === 0 || !Cli[userCommand]) {
+  Cli[DEFAULT_COMMAND].run();
+  process.exit(ExitCode.success);
+}
 
-Гайд:
-service.js <command>
-
-Команды:
---version:            выводит номер версии
---help:               печатает этот текст
---generate <count>    формирует файл mocks.json`;
-
-let packageJson = require(`../../package.json`);
-
-process.argv.forEach((param) => {
-  if (param === `--version`) {
-    console.log(packageJson.version);
-  } else if (param === `--help`) {
-    console.log(helpText);
-  } else if (param === `--generate`) {
-    let lastElement = process.argv[process.argv.length - 1];
-    if (lastElement !== `--generate`) {
-      if (Number(lastElement)) {
-        if (lastElement >= 1000) {
-          console.log(`Не больше 1000 объявлений`);
-          process.exit();
-        } else {
-          let randomAds = myModule.randomAds(Number(lastElement));
-          const data = JSON.stringify(randomAds);
-          fs.writeFile(`../../mocks.json`, data, (err) => {
-            if (err) {
-              console.log(`1`);
-            } else {
-              console.log(`0`);
-            }
-          });
-        }
-      } else {
-        let randomAd = myModule.randomAds(1);
-        const data = JSON.stringify(randomAd);
-        fs.writeFile(`../../mocks.json`, data, (err) => {
-          if (err) {
-            console.log(`1`);
-          } else {
-            console.log(`0`);
-          }
-        });
-      }
-    } else {
-      let randomAd = myModule.randomAds(1);
-      const data = JSON.stringify(randomAd);
-      fs.writeFile(`../../mocks.json`, data, (err) => {
-        if (err) {
-          console.log(`1`);
-        } else {
-          console.log(`0`);
-        }
-      });
-    }
-  }
-});
-
-
+Cli[userCommand].run(userArguments.slice(1));
