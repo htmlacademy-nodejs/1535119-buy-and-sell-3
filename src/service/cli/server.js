@@ -3,7 +3,6 @@
 const chalk = require(`chalk`);
 const http = require(`http`);
 const fs = require(`fs`).promises;
-//const HttpCode = require(`../http_code`);
 
 const HttpCode = {
   OK: 200,
