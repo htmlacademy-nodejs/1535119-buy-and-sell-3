@@ -1,37 +1,21 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const fs = require(`fs`).promises;
 
-const HttpCode = {
-  OK: 200,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-  FORBIDDEN: 403,
-  UNAUTHORIZED: 401,
-};
-
+const HttpCode = require(`../http-code`);
 const express = require(`express`);
+
+const DEFAULT_PORT = 3000;
 
 const app = express();
 app.use(express.json());
 
-app.get(`/offers`, async (req, res) => {
-  try {
-    const fileContent = await fs.readFile(FILENAME);
-    const mocks = JSON.parse(fileContent);
-    res.json(mocks);
-  } catch (err) {
-    res.status(HttpCode.INTERNAL_SERVER_ERROR).send(err);
-  }
-});
+const offersRoutes = require(`./routes/offers-routes`);
+app.use(`/offers`, offersRoutes);
 
 app.use((req, res) => res
   .status(HttpCode.NOT_FOUND)
   .send(`Not found`));
-
-const DEFAULT_PORT = 3000;
-const FILENAME = `mocks.json`;
 
 module.exports = {
   name: `--server`,
